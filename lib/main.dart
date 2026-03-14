@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:random_bull_application/screens/check_num_page.dart';
+import 'package:random_bull_application/screens/count_char_page.dart';
+import 'screens/sum_subtract_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +34,7 @@ class MyApp extends StatelessWidget {
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: SumSubtractPage(),
     );
   }
 }
