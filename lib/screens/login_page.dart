@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:random_bull_application/screens/home_page.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _userController = TextEditingController();
   final _passController = TextEditingController();
@@ -39,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (username == 'kelompok' && password == 'test') {
       // Login berhasil → ke Home
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const home_page()),
+        MaterialPageRoute(builder: (_) => const HomePage()),
       );
     } else {
       // Login gagal → tampilkan snackbar
@@ -81,7 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Field Username
                 const Text('Username',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                    style:
+                        TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 6),
                 TextFormField(
                   controller: _userController,
@@ -90,14 +92,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'Masukkan username',
                     border: OutlineInputBorder(),
                   ),
-                  validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Username tidak boleh kosong' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Username tidak boleh kosong'
+                      : null,
                 ),
                 const SizedBox(height: 18),
 
                 // Field Password
                 const Text('Password',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                    style:
+                        TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 6),
                 TextFormField(
                   controller: _passController,
@@ -115,8 +119,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           setState(() => _passVisible = !_passVisible),
                     ),
                   ),
-                  validator: (v) =>
-                  (v == null || v.isEmpty) ? 'Password tidak boleh kosong' : null,
+                  validator: (v) => (v == null || v.isEmpty)
+                      ? 'Password tidak boleh kosong'
+                      : null,
                 ),
                 const SizedBox(height: 28),
 
@@ -134,16 +139,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor:
-                        AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
                         : const Text('Masuk',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],

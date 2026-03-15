@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/home_page.dart'; // Memanggil HomePage yang ada di folder screens
+import 'package:random_bull_application/screens/login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,8 +18,8 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner:
           false, // Menghilangkan tulisan "DEBUG" di pojok
-      // Aplikasi akan langsung membuka HomePage saat pertama kali dijalankan
-      home: const HomePage(),
+      // Aplikasi akan langsung membuka LoginPage saat pertama kali dijalankan
+      home: const LoginPage(),
     );
   }
 }

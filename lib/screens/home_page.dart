@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:random_bull_application/screens/check_num_page.dart';
 import 'package:random_bull_application/screens/count_char_page.dart';
 import 'package:random_bull_application/screens/sum_subtract_page.dart';
 import 'login_page.dart';
@@ -72,23 +73,23 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Menu Items
-              _buildMenuCard(
-                context,
-                icon: Icons.login_rounded,
-                title: 'Login',
-                description: 'Masuk dengan username & password',
-                difficulty: '⭐⭐',
-                color: Colors.blue,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginPage(),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
+              // _buildMenuCard(
+              //   context,
+              //   icon: Icons.login_rounded,
+              //   title: 'Login',
+              //   description: 'Masuk dengan username & password',
+              //   difficulty: '⭐⭐',
+              //   color: Colors.blue,
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => const LoginPage(),
+              //       ),
+              //     );
+              //   },
+              // ),
+              // const SizedBox(height: 16),
 
               _buildMenuCard(
                 context,
@@ -148,14 +149,15 @@ class HomePage extends StatelessWidget {
                 context,
                 icon: Icons.calculate_rounded,
                 title: 'Penentuan Ganjil Genap & Prima',
-                description: 'Cek apakah angka ganjil/genap dan prima/bukan prima',
+                description:
+                    'Cek apakah angka ganjil/genap dan prima/bukan prima',
                 difficulty: '⭐⭐⭐⭐',
                 color: Colors.purple,
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const SumSubtractPage(),
+                      builder: (context) => const CheckNumPage(),
                     ),
                   );
                 },
@@ -166,7 +168,8 @@ class HomePage extends StatelessWidget {
                 context,
                 icon: Icons.calculate_rounded,
                 title: 'Deteksi Karakter',
-                description: 'Hitung total karakter, huruf, angka, simbol, kata, spasi',
+                description:
+                    'Hitung total karakter, huruf, angka, simbol, kata, spasi',
                 difficulty: '⭐⭐⭐⭐',
                 color: Colors.purple,
                 onTap: () {
