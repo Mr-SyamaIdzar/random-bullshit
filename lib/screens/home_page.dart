@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+<<<<<<< Updated upstream
 import 'login_page.dart';
+=======
+import 'package:random_bull_application/screens/check_num_page.dart';
+import 'package:random_bull_application/screens/count_char_page.dart';
+import 'package:random_bull_application/screens/sum_subtract_page.dart';
+import 'package:random_bull_application/screens/tanggal_lahir_page.dart';
+>>>>>>> Stashed changes
 import 'data_kelompok_page.dart';
 import 'stopwatch_page.dart';
 import 'kalkulator_page.dart';
@@ -73,21 +80,53 @@ class HomePage extends StatelessWidget {
               // Menu Items
               _buildMenuCard(
                 context,
+<<<<<<< Updated upstream
                 icon: Icons.login_rounded,
                 title: 'Login',
                 description: 'Masuk dengan username & password',
                 difficulty: '⭐⭐',
                 color: Colors.blue,
+=======
+                icon: Icons.calendar_month_rounded,
+                title: 'Tanggal Lahir',
+                description: 'Input tahun, bulan, hari, jam, dan menit',
+                difficulty: '⭐⭐⭐',
+                color: Colors.teal, // Bebas diganti warnanya
+>>>>>>> Stashed changes
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
+<<<<<<< Updated upstream
                       builder: (context) => const LoginPage(),
+=======
+                      builder: (context) => const TanggalLahirPage(),
+>>>>>>> Stashed changes
                     ),
                   );
                 },
               ),
               const SizedBox(height: 16),
+<<<<<<< Updated upstream
+=======
+              // _buildMenuCard(
+              //   context,
+              //   icon: Icons.login_rounded,
+              //   title: 'Login',
+              //   description: 'Masuk dengan username & password',
+              //   difficulty: '⭐⭐',
+              //   color: Colors.blue,
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => const LoginPage(),
+              //       ),
+              //     );
+              //   },
+              // ),
+              // const SizedBox(height: 16),
+>>>>>>> Stashed changes
 
               _buildMenuCard(
                 context,
