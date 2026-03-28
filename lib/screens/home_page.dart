@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:random_bull_application/screens/check_num_page.dart';
 import 'package:random_bull_application/screens/count_char_page.dart';
 import 'package:random_bull_application/screens/sum_subtract_page.dart';
+import 'package:random_bull_application/screens/tanggal_lahir_page.dart';
+
 import 'data_kelompok_page.dart';
 import 'stopwatch_page.dart';
 import 'piramid_page.dart';
@@ -72,6 +75,21 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Menu Items
+                icon: Icons.calendar_month_rounded,
+                title: 'Tanggal Lahir',
+                description: 'Input tahun, bulan, hari, jam, dan menit',
+                difficulty: '⭐⭐⭐',
+                color: Colors.teal, // Bebas diganti warnanya
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TanggalLahirPage(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
               // _buildMenuCard(
               //   context,
               //   icon: Icons.login_rounded,
