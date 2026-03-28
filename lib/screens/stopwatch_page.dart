@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class StopwatchPage extends StatefulWidget {
-  const StopwatchPage({super.key});
+  const StopwatchPage({Key? key}) : super(key: key);
 
   @override
   State<StopwatchPage> createState() => _StopwatchPageState();
@@ -13,15 +13,23 @@ class _StopwatchPageState extends State<StopwatchPage> {
   final Stopwatch _stopwatch = Stopwatch();
   late Timer _timer;
 
-  String _displayTime = "00:00:00";
+  String _displayTime = "00:00:00:00";
   List<String> _records = [];
 
   void _start() {
     _stopwatch.start();
 
-    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
       setState(() {
-        _displayTime = _formatTime(_stopwatch.elapsedMilliseconds);
+        int elapsed = _stopwatch.elapsedMilliseconds;
+
+        // Jika lebih dari 24 jam → reset ke 0
+        if (elapsed >= 24 * 60 * 60 * 1000) {
+          _stopwatch.reset();
+          elapsed = 0;
+        }
+
+        _displayTime = _formatTime(elapsed);
       });
     });
   }
@@ -36,7 +44,7 @@ class _StopwatchPageState extends State<StopwatchPage> {
     _timer.cancel();
 
     setState(() {
-      _displayTime = "00:00:00";
+      _displayTime = "00:00:00:00";
       _records.clear();
     });
   }
@@ -56,15 +64,17 @@ class _StopwatchPageState extends State<StopwatchPage> {
   }
 
   String _formatTime(int milliseconds) {
-    int hundreds = (milliseconds / 10).truncate();
-    int seconds = (hundreds / 100).truncate();
-    int minutes = (seconds / 60).truncate();
+    int hours = (milliseconds ~/ (1000 * 60 * 60)) % 24;
+    int minutes = (milliseconds ~/ (1000 * 60)) % 60;
+    int seconds = (milliseconds ~/ 1000) % 60;
+    int ms = (milliseconds ~/ 10) % 100;
 
-    String minutesStr = (minutes % 60).toString().padLeft(2, '0');
-    String secondsStr = (seconds % 60).toString().padLeft(2, '0');
-    String hundredsStr = (hundreds % 100).toString().padLeft(2, '0');
+    String hoursStr = hours.toString().padLeft(2, '0');
+    String minutesStr = minutes.toString().padLeft(2, '0');
+    String secondsStr = seconds.toString().padLeft(2, '0');
+    String msStr = ms.toString().padLeft(2, '0');
 
-    return "$minutesStr:$secondsStr:$hundredsStr";
+    return "$hoursStr:$minutesStr:$secondsStr:$msStr";
   }
 
   @override
@@ -83,7 +93,6 @@ class _StopwatchPageState extends State<StopwatchPage> {
         title: const Text("Stopwatch"),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -91,7 +100,7 @@ class _StopwatchPageState extends State<StopwatchPage> {
 
             const SizedBox(height: 20),
 
-            ///Time
+            /// Time
             Text(
               _displayTime,
               style: const TextStyle(
@@ -103,7 +112,7 @@ class _StopwatchPageState extends State<StopwatchPage> {
 
             const SizedBox(height: 30),
 
-            ///Tombol
+            /// Tombol
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
