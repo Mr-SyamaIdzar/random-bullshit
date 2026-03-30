@@ -61,8 +61,8 @@ class _PiramidPageState extends State<PiramidPage> {
 
   String _fmt(double n) =>
       double.parse(n.toStringAsFixed(2)) == n.truncateToDouble()
-      ? n.toInt().toString()
-      : n.toStringAsFixed(2);
+          ? n.toInt().toString()
+          : n.toStringAsFixed(2);
 
   @override
   void dispose() {
@@ -341,14 +341,17 @@ class _HasilCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Flexible(
-                child: Text(
-                  nilai,
-                  style: TextStyle(
-                    color: warna,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    nilai,
+                    style: TextStyle(
+                      color: warna,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 4),

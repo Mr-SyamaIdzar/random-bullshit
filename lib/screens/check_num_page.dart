@@ -17,18 +17,18 @@ class _CheckNumPageState extends State<CheckNumPage> {
   bool _sudahCek = false;
 
   // Cek apakah bilangan prima (trial division O(√n))
-  bool _isPrima(int n) {
-    if (n < 2) return false;
-    if (n == 2) return true;
-    if (n % 2 == 0) return false;
-    for (int i = 3; i * i <= n; i += 2) {
-      if (n % i == 0) return false;
+  bool _isPrima(BigInt n) {
+    if (n < BigInt.two) return false;
+    if (n == BigInt.two) return true;
+    if (n % BigInt.two == BigInt.zero) return false;
+    for (BigInt i = BigInt.from(3); i * i <= n; i += BigInt.two) {
+      if (n % i == BigInt.zero) return false;
     }
     return true;
   }
 
   void _cek() {
-    final n = int.tryParse(_controller.text.trim());
+    final n = BigInt.tryParse(_controller.text.trim());
     if (n == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Masukkan bilangan bulat yang valid!')),
@@ -36,12 +36,11 @@ class _CheckNumPageState extends State<CheckNumPage> {
       return;
     }
     setState(() {
-      _ganjilGenap = n % 2 != 0
+      _ganjilGenap = n % BigInt.two != BigInt.zero
           ? '$n adalah Bilangan Ganjil'
           : '$n adalah Bilangan Genap';
-      _prima = _isPrima(n)
-          ? '$n adalah Bilangan Prima'
-          : '$n bukan Bilangan Prima';
+      _prima =
+          _isPrima(n) ? '$n adalah Bilangan Prima' : '$n bukan Bilangan Prima';
       _sudahCek = true;
     });
     FocusScope.of(context).unfocus();
@@ -210,29 +209,33 @@ class _HasilCard extends StatelessWidget {
         border: Border.all(color: warna.withOpacity(0.2)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: warna, size: 28),
           const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  color: warna,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: warna,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                hasil,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
+                const SizedBox(height: 2),
+                Text(
+                  hasil,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  softWrap: true,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

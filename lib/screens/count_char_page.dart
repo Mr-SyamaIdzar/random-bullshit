@@ -12,7 +12,7 @@ class _CountCharPageState extends State<CountCharPage> {
   final _controller = TextEditingController();
   bool _sudahHitung = false;
 
-  int _total = 0, _huruf = 0, _angka = 0, _simbol = 0, _kata = 0, _spasi = 0;
+  int _total = 0, _huruf = 0, _angka = 0, _simbol = 0, _spasi = 0;
 
   void _hitung() {
     final teks = _controller.text;
@@ -25,10 +25,14 @@ class _CountCharPageState extends State<CountCharPage> {
 
     int h = 0, a = 0, s = 0, sp = 0;
     for (final c in teks.split('')) {
-      if (RegExp(r'[a-zA-Z]').hasMatch(c)) h++;
-      else if (RegExp(r'[0-9]').hasMatch(c)) a++;
-      else if (c == ' ' || c == '\n' || c == '\t') sp++;
-      else s++;
+      if (RegExp(r'[a-zA-Z]').hasMatch(c))
+        h++;
+      else if (RegExp(r'[0-9]').hasMatch(c))
+        a++;
+      else if (c == ' ' || c == '\n' || c == '\t')
+        sp++;
+      else
+        s++;
     }
 
     setState(() {
@@ -37,7 +41,6 @@ class _CountCharPageState extends State<CountCharPage> {
       _angka = a;
       _simbol = s;
       _spasi = sp;
-      _kata = teks.trim().isEmpty ? 0 : teks.trim().split(RegExp(r'\s+')).length;
       _sudahHitung = true;
     });
     FocusScope.of(context).unfocus();
@@ -179,7 +182,6 @@ class _CountCharPageState extends State<CountCharPage> {
                   _StatTile('Angka', _angka, const Color(0xFF11998E)),
                   _StatTile('Simbol', _simbol, const Color(0xFFFF9800)),
                   _StatTile('Spasi', _spasi, const Color(0xFF9C27B0)),
-                  _StatTile('Kata', _kata, const Color(0xFF2196F3)),
                 ],
               ),
             ],
@@ -213,8 +215,7 @@ class _StatTile extends StatelessWidget {
               style: TextStyle(
                   color: warna, fontSize: 24, fontWeight: FontWeight.w800)),
           const SizedBox(width: 10),
-          Text(label,
-              style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
         ],
       ),
     );
