@@ -75,6 +75,8 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Menu Items
+              _buildMenuCard(
+                context,
                 icon: Icons.calendar_month_rounded,
                 title: 'Tanggal Lahir',
                 description: 'Input tahun, bulan, hari, jam, dan menit',
