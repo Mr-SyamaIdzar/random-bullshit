@@ -14,6 +14,7 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
 
   String? weton;
   String? hijriah;
+  String? saka;
 
   //  Tanggal
   Future<void> _selectDate(BuildContext context) async {
@@ -28,9 +29,10 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
       setState(() {
         selectedDate = picked;
 
-        // Hitung weton & hijriah
+        // Hitung weton, hijriah & saka
         weton = _getWeton(picked);
         hijriah = _convertToHijriah(picked);
+        saka = _convertToSaka(picked);
       });
     }
   }
@@ -68,7 +70,7 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
     return "$namaHari $namaPasaran";
   }
 
-  // hijriah
+  // Hijriah
   String _convertToHijriah(DateTime date) {
     int day = date.day;
     int month = date.month;
@@ -113,6 +115,65 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
     return "$d ${bulanHijriah[m - 1]} $y H";
   }
 
+  // Saka
+  String _convertToSaka(DateTime date) {
+    int day = date.day;
+    int month = date.month;
+    int year = date.year;
+
+    if (month < 3) {
+      year -= 1;
+      month += 12;
+    }
+
+    int a = year ~/ 100;
+    int b = 2 - a + (a ~/ 4);
+
+    int jd = (365.25 * (year + 4716)).floor() +
+        (30.6001 * (month + 1)).floor() +
+        day + b - 1524;
+
+    int sakaJD = jd - 1749994;
+
+    int sakaYear = ((sakaJD - 1) / 365.25).floor();
+    int remaining = sakaJD - (sakaYear * 365 + (sakaYear ~/ 4));
+
+    if (remaining <= 0) {
+      sakaYear -= 1;
+      remaining = sakaJD - (sakaYear * 365 + (sakaYear ~/ 4));
+    }
+
+    List<int> panjangBulan = [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29];
+
+    // Tahun kabisat Saka: habis dibagi 4
+    bool isKabisat = (sakaYear % 4 == 0);
+    if (isKabisat) panjangBulan[1] = 30; // Waisaka jadi 30 hari
+
+    int sakaMonth = 0;
+    int sakaDay = remaining;
+
+    for (int i = 0; i < 12; i++) {
+      if (sakaDay <= panjangBulan[i]) {
+        sakaMonth = i + 1;
+        break;
+      }
+      sakaDay -= panjangBulan[i];
+    }
+
+    if (sakaMonth == 0) {
+      sakaMonth = 12;
+      sakaDay = remaining;
+    }
+
+    List<String> bulanSaka = [
+      "Caitra", "Waisaka", "Jyaistha", "Asadha",
+      "Srawana", "Bhadra", "Aswina", "Kartika",
+      "Margasira", "Pausha", "Magha", "Phalguna"
+    ];
+
+    return "$sakaDay ${bulanSaka[sakaMonth - 1]} $sakaYear Saka";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,7 +195,7 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
 
             const SizedBox(height: 30),
 
-            // tgl
+            // Tgl
             ElevatedButton.icon(
               onPressed: () => _selectDate(context),
               icon: const Icon(Icons.calendar_today),
@@ -152,7 +213,7 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
 
             const SizedBox(height: 30),
 
-            // waktu
+            // Waktu
             ElevatedButton.icon(
               onPressed: () => _selectTime(context),
               icon: const Icon(Icons.access_time),
@@ -170,7 +231,7 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
 
             const SizedBox(height: 30),
 
-            // weton
+            // Weton
             if (weton != null) ...[
               const Text(
                 "Weton:",
@@ -185,7 +246,7 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
               const SizedBox(height: 20),
             ],
 
-            // hijriah
+            // Hijriah
             if (hijriah != null) ...[
               const Text(
                 "Tanggal Hijriah:",
@@ -197,7 +258,23 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.green[700]),
               ),
+              const SizedBox(height: 20),
             ],
+
+            // Saka
+            if (saka != null) ...[
+              const Text(
+                "Tanggal Saka:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                saka!,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.orange[700]),
+              ),
+            ],
+
           ],
         ),
       ),
