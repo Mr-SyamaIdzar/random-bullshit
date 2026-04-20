@@ -14,6 +14,7 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
   String? weton;
   String? hijriah;
   String? saka;
+  Map<String, int>? umur;
 
   //  Tanggal
   Future<void> _selectDate(BuildContext context) async {
@@ -27,11 +28,10 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
-
-        // Hitung weton, hijriah & saka
         weton = _getWeton(picked);
         hijriah = _convertToHijriah(picked);
         saka = _convertToSaka(picked);
+        umur = _hitungUmur(picked);
       });
     }
   }
@@ -203,6 +203,29 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
     return "$sakaDay ${bulanSaka[sakaMonth - 1]} $sakaYear Saka";
   }
 
+  // Kalkulasi umur
+  Map<String, int> _hitungUmur(DateTime lahir) {
+    DateTime sekarang = DateTime.now();
+
+    int tahun = sekarang.year - lahir.year;
+    int bulan = sekarang.month - lahir.month;
+    int hari = sekarang.day - lahir.day;
+
+    if (hari < 0) {
+      bulan -= 1;
+      // Ambil jumlah hari dari bulan sebelumnya
+      DateTime bulanLalu = DateTime(sekarang.year, sekarang.month - 1);
+      hari += DateTime(bulanLalu.year, bulanLalu.month + 1, 0).day;
+    }
+
+    if (bulan < 0) {
+      tahun -= 1;
+      bulan += 12;
+    }
+
+    return {"tahun": tahun, "bulan": bulan, "hari": hari};
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -300,6 +323,21 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
                 saka!,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.orange[700]),
+              ),
+            ],
+
+            // Umur
+            if (umur != null) ...[
+              const SizedBox(height: 20),
+              const Text(
+                "Umur:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                "${umur!['tahun']} tahun, ${umur!['bulan']} bulan, ${umur!['hari']} hari",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.purple[700]),
               ),
             ],
           ],
