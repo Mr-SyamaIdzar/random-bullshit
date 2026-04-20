@@ -8,7 +8,6 @@ class TanggalLahirPage extends StatefulWidget {
 }
 
 class _TanggalLahirPageState extends State<TanggalLahirPage> {
-
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
 
@@ -54,17 +53,24 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
   // Weton
   String _getWeton(DateTime date) {
     List<String> hari = [
-      "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"
+      "Senin",
+      "Selasa",
+      "Rabu",
+      "Kamis",
+      "Jumat",
+      "Sabtu",
+      "Minggu"
     ];
 
-    List<String> pasaran = [
-      "Legi", "Pahing", "Pon", "Wage", "Kliwon"
-    ];
+    List<String> pasaran = ["Pahing", "Pon", "Wage", "Kliwon", "Legi"];
 
-    DateTime baseDate = DateTime(1900, 1, 1);
+    // DateTime baseDate = DateTime(1900, 1, 1);
+    DateTime baseDate = DateTime(1899, 12, 31);
     int selisihHari = date.difference(baseDate).inDays;
 
-    String namaHari = hari[date.weekday % 7];
+    // date.weekday di Flutter/Dart mengembalikan 1=Senin, 7=Minggu, bukan 0=Minggu seperti diasumsikan.
+    // String namaHari = hari[date.weekday % 7];
+    String namaHari = hari[date.weekday - 1]; // langsung, tidak perlu % 7
     String namaPasaran = pasaran[selisihHari % 5];
 
     return "$namaHari $namaPasaran";
@@ -86,20 +92,18 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
 
     int jd = (365.25 * (year + 4716)).floor() +
         (30.6001 * (month + 1)).floor() +
-        day + b - 1524;
+        day +
+        b -
+        1524;
 
     int l = jd - 1948440 + 10632;
     int n = ((l - 1) / 10631).floor();
     l = l - 10631 * n + 354;
-    int j = ((10985 - l) / 5316).floor() *
-            ((50 * l) / 17719).floor() +
-        (l / 5670).floor() *
-            ((43 * l) / 15238).floor();
+    int j = ((10985 - l) / 5316).floor() * ((50 * l) / 17719).floor() +
+        (l / 5670).floor() * ((43 * l) / 15238).floor();
     l = l -
-        ((30 - j) / 15).floor() *
-            ((17719 * j) / 50).floor() -
-        (j / 16).floor() *
-            ((15238 * j) / 43).floor() +
+        ((30 - j) / 15).floor() * ((17719 * j) / 50).floor() -
+        (j / 16).floor() * ((15238 * j) / 43).floor() +
         29;
 
     int m = (24 * l / 709).floor();
@@ -107,12 +111,25 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
     int y = 30 * n + j - 30;
 
     List<String> bulanHijriah = [
-      "Muharram", "Safar", "Rabiul Awal", "Rabiul Akhir",
-      "Jumadil Awal", "Jumadil Akhir", "Rajab", "Syaban",
-      "Ramadhan", "Syawal", "Dzulqaidah", "Dzulhijjah"
+      "Muharram",
+      "Safar",
+      "Rabiul Awal",
+      "Rabiul Akhir",
+      "Jumadil Awal",
+      "Jumadil Akhir",
+      "Rajab",
+      "Syaban",
+      "Ramadhan",
+      "Syawal",
+      "Dzulqaidah",
+      "Dzulhijjah"
     ];
 
     return "$d ${bulanHijriah[m - 1]} $y H";
+  }
+
+  bool _isGregorianLeap(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
   }
 
   // Saka
@@ -131,9 +148,11 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
 
     int jd = (365.25 * (year + 4716)).floor() +
         (30.6001 * (month + 1)).floor() +
-        day + b - 1524;
+        day +
+        b -
+        1524;
 
-    int sakaJD = jd - 1749994;
+    int sakaJD = jd - 1749615;
 
     int sakaYear = ((sakaJD - 1) / 365.25).floor();
     int remaining = sakaJD - (sakaYear * 365 + (sakaYear ~/ 4));
@@ -143,11 +162,12 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
       remaining = sakaJD - (sakaYear * 365 + (sakaYear ~/ 4));
     }
 
-    List<int> panjangBulan = [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29];
+    // Tahun kabisat jika (sakaYear + 78) adalah kabisat Gregorian
+    bool isKabisat = _isGregorianLeap(sakaYear + 78);
 
-    // Tahun kabisat Saka: habis dibagi 4
-    bool isKabisat = (sakaYear % 4 == 0);
-    if (isKabisat) panjangBulan[1] = 30; // Waisaka jadi 30 hari
+    List<int> panjangBulan = isKabisat
+        ? [31, 29, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30] // kabisat
+        : [30, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30]; // biasa
 
     int sakaMonth = 0;
     int sakaDay = remaining;
@@ -166,9 +186,18 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
     }
 
     List<String> bulanSaka = [
-      "Caitra", "Waisaka", "Jyaistha", "Asadha",
-      "Srawana", "Bhadra", "Aswina", "Kartika",
-      "Margasira", "Pausha", "Magha", "Phalguna"
+      "Caitra",
+      "Waisaka",
+      "Jyaistha",
+      "Asadha",
+      "Srawana",
+      "Bhadra",
+      "Aswina",
+      "Kartika",
+      "Margasira",
+      "Pausha",
+      "Magha",
+      "Phalguna"
     ];
 
     return "$sakaDay ${bulanSaka[sakaMonth - 1]} $sakaYear Saka";
@@ -186,7 +215,6 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-
             const Text(
               'Silakan masukkan tanggal dan waktu lahirmu:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -274,7 +302,6 @@ class _TanggalLahirPageState extends State<TanggalLahirPage> {
                 style: TextStyle(color: Colors.orange[700]),
               ),
             ],
-
           ],
         ),
       ),
