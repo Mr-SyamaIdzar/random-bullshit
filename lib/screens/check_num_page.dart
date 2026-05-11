@@ -10,10 +10,12 @@ class CheckNumPage extends StatefulWidget {
 }
 
 class _CheckNumPageState extends State<CheckNumPage> {
-  final _controller = TextEditingController();
+  final _controllerReal = TextEditingController();
+  final _controllerInt = TextEditingController();
 
   String _ganjilGenap = '';
   String _prima = '';
+  String _positifNegatif = '';
   bool _sudahCek = false;
 
   // Cek apakah bilangan prima (trial division O(√n))
@@ -28,32 +30,72 @@ class _CheckNumPageState extends State<CheckNumPage> {
   }
 
   void _cek() {
-    final n = BigInt.tryParse(_controller.text.trim());
-    if (n == null) {
+    final textReal = _controllerReal.text.trim();
+    final textInt = _controllerInt.text.trim();
+
+    final d = double.tryParse(textReal);
+    final n = BigInt.tryParse(textInt);
+
+    if (textReal.isEmpty && textInt.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Masukkan bilangan bulat yang valid!')),
+        const SnackBar(content: Text('Masukkan minimal satu bilangan!')),
       );
       return;
     }
+
+    if (textReal.isNotEmpty && d == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bilangan real tidak valid!')),
+      );
+      return;
+    }
+
+    if (textInt.isNotEmpty && n == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bilangan bulat tidak valid!')),
+      );
+      return;
+    }
+
     setState(() {
-      _ganjilGenap = n % BigInt.two != BigInt.zero
-          ? '$n adalah Bilangan Ganjil'
-          : '$n adalah Bilangan Genap';
-      _prima =
-          _isPrima(n) ? '$n adalah Bilangan Prima' : '$n bukan Bilangan Prima';
+      _positifNegatif = '';
+      _ganjilGenap = '';
+      _prima = '';
+
+      if (textReal.isNotEmpty && d != null) {
+        if (d > 0) {
+          _positifNegatif = '$textReal adalah Bilangan Positif';
+        } else if (d < 0) {
+          _positifNegatif = '$textReal adalah Bilangan Negatif';
+        } else {
+          _positifNegatif = '$textReal adalah Nol';
+        }
+      }
+
+      if (textInt.isNotEmpty && n != null) {
+        _ganjilGenap = n % BigInt.two != BigInt.zero
+            ? '$n adalah Bilangan Ganjil'
+            : '$n adalah Bilangan Genap';
+        _prima = _isPrima(n)
+            ? '$n adalah Bilangan Prima'
+            : '$n bukan Bilangan Prima';
+      }
+
       _sudahCek = true;
     });
     FocusScope.of(context).unfocus();
   }
 
   void _reset() {
-    _controller.clear();
+    _controllerReal.clear();
+    _controllerInt.clear();
     setState(() => _sudahCek = false);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controllerReal.dispose();
+    _controllerInt.dispose();
     super.dispose();
   }
 
@@ -75,30 +117,32 @@ class _CheckNumPageState extends State<CheckNumPage> {
           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Deskripsi
+            // Deskripsi Real
             const Text(
-              'Masukkan bilangan bulat untuk dicek apakah ganjil/genap dan prima/bukan.',
-              style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.5),
+              'Cek Positif / Negatif (Bilangan Real)',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
-            const SizedBox(height: 24),
-
-            // Input
+            const SizedBox(height: 8),
+            // Input Real
             TextField(
-              controller: _controller,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              controller: _controllerReal,
+              keyboardType: const TextInputType.numberWithOptions(
+                  signed: true, decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*')),
+              ],
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
               decoration: InputDecoration(
-                hintText: '0',
+                hintText: 'Contoh: -3.14',
                 hintStyle: const TextStyle(
                   color: Color(0xFFDDDDDD),
-                  fontSize: 32,
+                  fontSize: 24,
                 ),
                 filled: true,
                 fillColor: const Color(0xFFF5F5F5),
@@ -110,11 +154,58 @@ class _CheckNumPageState extends State<CheckNumPage> {
                   borderRadius: BorderRadius.circular(14),
                   borderSide: const BorderSide(color: primary, width: 2),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              onChanged: (_) => setState(() => _sudahCek = false),
+              onChanged: (val) {
+                if (val.isNotEmpty && _controllerInt.text.isNotEmpty) {
+                  _controllerInt.clear();
+                }
+                setState(() => _sudahCek = false);
+              },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+
+            // Deskripsi Int
+            const Text(
+              'Cek Ganjil / Genap & Prima (Bilangan Bulat)',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+            const SizedBox(height: 8),
+            // Input Int
+            TextField(
+              controller: _controllerInt,
+              keyboardType: const TextInputType.numberWithOptions(signed: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^-?\d*')),
+              ],
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+              decoration: InputDecoration(
+                hintText: 'Contoh: 7',
+                hintStyle: const TextStyle(
+                  color: Color(0xFFDDDDDD),
+                  fontSize: 24,
+                ),
+                filled: true,
+                fillColor: const Color(0xFFF5F5F5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: primary, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              onChanged: (val) {
+                if (val.isNotEmpty && _controllerReal.text.isNotEmpty) {
+                  _controllerReal.clear();
+                }
+                setState(() => _sudahCek = false);
+              },
+            ),
+            const SizedBox(height: 24),
 
             // Tombol CEK & Reset
             Row(
@@ -164,19 +255,32 @@ class _CheckNumPageState extends State<CheckNumPage> {
             // Hasil
             if (_sudahCek) ...[
               const SizedBox(height: 28),
-              _HasilCard(
-                label: 'Ganjil / Genap',
-                hasil: _ganjilGenap,
-                warna: const Color(0xFF667EEA),
-                icon: Icons.swap_horiz_rounded,
-              ),
-              const SizedBox(height: 12),
-              _HasilCard(
-                label: 'Bilangan Prima',
-                hasil: _prima,
-                warna: const Color(0xFFFF9800),
-                icon: Icons.star_rounded,
-              ),
+              if (_positifNegatif.isNotEmpty) ...[
+                _HasilCard(
+                  label: 'Positif / Negatif',
+                  hasil: _positifNegatif,
+                  warna: const Color(0xFF4CAF50),
+                  icon: Icons.calculate_rounded,
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (_ganjilGenap.isNotEmpty) ...[
+                _HasilCard(
+                  label: 'Ganjil / Genap',
+                  hasil: _ganjilGenap,
+                  warna: const Color(0xFF667EEA),
+                  icon: Icons.swap_horiz_rounded,
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (_prima.isNotEmpty) ...[
+                _HasilCard(
+                  label: 'Bilangan Prima',
+                  hasil: _prima,
+                  warna: const Color(0xFFFF9800),
+                  icon: Icons.star_rounded,
+                ),
+              ],
             ],
           ],
         ),

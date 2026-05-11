@@ -12,7 +12,7 @@ class _CountCharPageState extends State<CountCharPage> {
   final _controller = TextEditingController();
   bool _sudahHitung = false;
 
-  int _total = 0, _huruf = 0, _angka = 0, _simbol = 0, _spasi = 0;
+  int _total = 0, _huruf = 0, _angka = 0, _simbol = 0, _spasi = 0, _kata = 0;
 
   void _hitung() {
     final teks = _controller.text;
@@ -23,24 +23,31 @@ class _CountCharPageState extends State<CountCharPage> {
       return;
     }
 
-    int h = 0, a = 0, s = 0, sp = 0;
+    int h = 0, s = 0, sp = 0;
+
     for (final c in teks.split('')) {
       if (RegExp(r'[a-zA-Z]').hasMatch(c))
         h++;
-      else if (RegExp(r'[0-9]').hasMatch(c))
-        a++;
       else if (c == ' ' || c == '\n' || c == '\t')
         sp++;
-      else
-        s++;
+      else if (!RegExp(r'[0-9.,]').hasMatch(c)) s++;
+      // digit, titik, koma → tidak dihitung per karakter di sini
     }
+
+    // Hitung angka per token: pisah by spasi & simbol kecuali . dan ,
+    // Contoh: "200.000" = 1 angka, "2026" = 1 angka, "25" = 1 angka
+    final tokenAngka = RegExp(r'[0-9][0-9.,]*').allMatches(teks).length;
+
+    // Hitung kata: hanya token yang mengandung huruf
+    final kata = RegExp(r'[a-zA-Z]+').allMatches(teks).length;
 
     setState(() {
       _total = teks.length;
       _huruf = h;
-      _angka = a;
+      _angka = tokenAngka;
       _simbol = s;
       _spasi = sp;
+      _kata = kata;
       _sudahHitung = true;
     });
     FocusScope.of(context).unfocus();
@@ -169,7 +176,7 @@ class _CountCharPageState extends State<CountCharPage> {
               ),
               const SizedBox(height: 16),
 
-              // Grid 2 kolom
+              // Grid 2 kolom — sekarang 6 item (3 baris)
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -182,6 +189,7 @@ class _CountCharPageState extends State<CountCharPage> {
                   _StatTile('Angka', _angka, const Color(0xFF11998E)),
                   _StatTile('Simbol', _simbol, const Color(0xFFFF9800)),
                   _StatTile('Spasi', _spasi, const Color(0xFF9C27B0)),
+                  _StatTile('Kata', _kata, const Color(0xFFE53935)),
                 ],
               ),
             ],

@@ -9,11 +9,10 @@ class StopwatchPage extends StatefulWidget {
 }
 
 class _StopwatchPageState extends State<StopwatchPage> {
-
   final Stopwatch _stopwatch = Stopwatch();
   late Timer _timer;
 
-  String _displayTime = "00:00:00:00";
+  String _displayTime = "23:59:57:00";
   List<String> _records = [];
 
   void _start() {
@@ -87,7 +86,6 @@ class _StopwatchPageState extends State<StopwatchPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Stopwatch"),
@@ -97,7 +95,6 @@ class _StopwatchPageState extends State<StopwatchPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-
             const SizedBox(height: 20),
 
             /// Time
@@ -116,22 +113,18 @@ class _StopwatchPageState extends State<StopwatchPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 ElevatedButton(
                   onPressed: _start,
                   child: const Text("Mulai"),
                 ),
-
                 ElevatedButton(
                   onPressed: _pause,
                   child: const Text("Pause"),
                 ),
-
                 ElevatedButton(
                   onPressed: _reset,
                   child: const Text("Reset"),
                 ),
-
                 ElevatedButton(
                   onPressed: _record,
                   child: const Text("Catat"),

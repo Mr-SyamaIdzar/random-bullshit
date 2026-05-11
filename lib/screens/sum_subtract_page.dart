@@ -14,16 +14,68 @@ class _SumSubtractPageState extends State<SumSubtractPage> {
 
   void _tekan(String nilai) => setState(() {
         _hasil = '';
-        // Jika input adalah operator (+/-) dan karakter terakhir juga operator,
-        // ganti operator terakhir dengan yang baru (jangan ditumpuk)
+
+        // Jika input operator dan karakter terakhir juga operator, ganti
         if ((nilai == '+' || nilai == '-') &&
             _ekspresi.isNotEmpty &&
             (_ekspresi.endsWith('+') || _ekspresi.endsWith('-'))) {
           _ekspresi = _ekspresi.substring(0, _ekspresi.length - 1) + nilai;
-        } else {
-          _ekspresi += nilai;
+          return;
         }
+
+        // Guard desimal: jangan tambah titik jika angka terakhir sudah punya titik
+        if (nilai == '.') {
+          // Cari angka terakhir (setelah + atau -)
+          final lastOp = _ekspresi.lastIndexOf(RegExp(r'[+\-](?!^)'));
+          final lastNum =
+              lastOp == -1 ? _ekspresi : _ekspresi.substring(lastOp + 1);
+          if (lastNum.contains('.')) return; // sudah ada titik, skip
+          if (lastNum.isEmpty) {
+            _ekspresi += '0'; // otomatis tambah 0 sebelum titik
+          }
+        }
+
+        _ekspresi += nilai;
       });
+
+  void _toggleSign() {
+    if (_ekspresi.isEmpty) return;
+    setState(() {
+      _hasil = '';
+
+      // Cari posisi operator terakhir (bukan di index 0)
+      int lastOp = -1;
+      for (int i = _ekspresi.length - 1; i > 0; i--) {
+        if (_ekspresi[i] == '+' || _ekspresi[i] == '-') {
+          lastOp = i;
+          break;
+        }
+      }
+
+      if (lastOp == -1) {
+        // Hanya satu angka, toggle tanda di depan
+        if (_ekspresi.startsWith('-')) {
+          _ekspresi = _ekspresi.substring(1);
+        } else {
+          _ekspresi = '-$_ekspresi';
+        }
+      } else {
+        // Ambil angka terakhir setelah operator
+        final beforeOp = _ekspresi.substring(0, lastOp);
+        final op = _ekspresi[lastOp];
+        final afterOp = _ekspresi.substring(lastOp + 1);
+
+        if (afterOp.isEmpty) return;
+
+        // Toggle: jika operator adalah + ganti ke -, dan sebaliknya
+        if (op == '+') {
+          _ekspresi = '$beforeOp-$afterOp';
+        } else {
+          _ekspresi = '$beforeOp+$afterOp';
+        }
+      }
+    });
+  }
 
   void _ac() => setState(() {
         _ekspresi = '';
@@ -53,17 +105,24 @@ class _SumSubtractPageState extends State<SumSubtractPage> {
     int i = 0;
     while (i < expr.length) {
       String num = '';
-      if (i == 0 && (expr[i] == '+' || expr[i] == '-')) num += expr[i++];
+      // Tanda di awal atau setelah operator
+      if ((i == 0 || ops.isNotEmpty) && (expr[i] == '+' || expr[i] == '-')) {
+        num += expr[i++];
+      }
       while (i < expr.length && (expr[i] == '.' || _isDigit(expr[i]))) {
         num += expr[i++];
       }
-      if (num.isNotEmpty && num != '+' && num != '-')
+      if (num.isNotEmpty && num != '+' && num != '-') {
         parts.add(double.parse(num));
+      }
       if (i < expr.length) ops.add(expr[i++]);
     }
+    if (parts.isEmpty) return 0;
     double total = parts[0];
     for (int j = 0; j < ops.length; j++) {
-      total += ops[j] == '+' ? parts[j + 1] : -parts[j + 1];
+      if (j + 1 < parts.length) {
+        total += ops[j] == '+' ? parts[j + 1] : -parts[j + 1];
+      }
     }
     return total;
   }
@@ -79,12 +138,10 @@ class _SumSubtractPageState extends State<SumSubtractPage> {
     const red = Color(0xFFE53935);
     const orange = Color(0xFFFF7043);
     const green = Color(0xFF11998E);
+    const purple = Color(0xFF8E24AA);
 
-    // Ukuran tombol & gap
     const double btnH = 72;
     const double gap = 12;
-
-    // Tinggi total tombol = yang mencakup 3 baris + 2 gap di antaranya
     const double equalH = btnH * 3 + gap * 2;
 
     return Scaffold(
@@ -161,17 +218,15 @@ class _SumSubtractPageState extends State<SumSubtractPage> {
                 ]),
                 const SizedBox(height: gap),
 
-                // Baris 2–4: angka 7-9, 4-6, 1-3 + tombol = yang membentang
+                // Baris 2–4: angka 7-9, 4-6, 1-3 + tombol =
                 Stack(
                   children: [
-                    // Kolom kiri: 3x3 angka
                     Column(
                       children: [
                         Row(children: [
                           _btn('7', h: btnH, onTap: () => _tekan('7')),
                           _btn('8', h: btnH, onTap: () => _tekan('8')),
                           _btn('9', h: btnH, onTap: () => _tekan('9')),
-                          // Ruang untuk tombol =
                           const Expanded(child: SizedBox()),
                         ]),
                         const SizedBox(height: gap),
@@ -191,7 +246,7 @@ class _SumSubtractPageState extends State<SumSubtractPage> {
                       ],
                     ),
 
-                    // Tombol = satu widget utuh di kolom ke-4
+                    // Tombol = membentang 3 baris
                     Positioned(
                       right: 0,
                       top: 0,
@@ -221,11 +276,12 @@ class _SumSubtractPageState extends State<SumSubtractPage> {
 
                 const SizedBox(height: gap),
 
-                // Baris 5: 0 (lebar 2) + . + slot kosong
+                // Baris 5: 0 (lebar 2) + . + +/-
                 Row(children: [
                   _btn('0', h: btnH, flex: 2, onTap: () => _tekan('0')),
                   _btn('.', h: btnH, onTap: () => _tekan('.')),
-                  const Expanded(child: SizedBox()),
+                  _btn('+/-',
+                      h: btnH, color: purple, onTap: _toggleSign, last: true),
                 ]),
               ],
             ),
@@ -235,7 +291,6 @@ class _SumSubtractPageState extends State<SumSubtractPage> {
     );
   }
 
-  /// Membuat satu tombol kalkulator dengan Expanded + flex.
   Widget _btn(String label,
       {required double h,
       required VoidCallback onTap,
